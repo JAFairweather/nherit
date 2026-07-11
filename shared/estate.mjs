@@ -99,6 +99,14 @@ export function newScopePayload(templateId, name) {
   }
 }
 
+/** Annual review (spec §5.2): true when the freshest scope edit is over a
+ *  year old — time to re-confirm beneficiaries and refresh document scans.
+ *  The whole product premise is "never out of date"; this is its nag. */
+export function reviewDue(payloads, nowSec = Math.floor(Date.now() / 1000)) {
+  const newest = Math.max(0, ...payloads.map(p => p?.updated_at ?? 0))
+  return newest > 0 && nowSec - newest > 365 * 86400
+}
+
 /** Minimal structural validation; returns a list of problems (empty = ok). */
 export function validateScopePayload(p) {
   const problems = []

@@ -6,7 +6,7 @@
 
 import { generateSecretKey, getPublicKey } from 'nostr-tools'
 import { newScopeKey, publishScope, grant, rotateScope, deleteScope } from '../lib/nipxx.mjs'
-import { TEMPLATES, templateById, newScopePayload, scopeOrder, validateScopePayload, PASSWORD_HINT } from '../shared/estate.mjs'
+import { TEMPLATES, templateById, newScopePayload, scopeOrder, validateScopePayload, reviewDue, PASSWORD_HINT } from '../shared/estate.mjs'
 import { sendRevocationNotice } from '../shared/notices.mjs'
 import { buildInviteUrl, createInvite } from '../shared/invite.mjs'
 import { $, esc, fmtSize, personName, state, syncIndex, load, RELAYS, storedNcryptsec } from './main.mjs'
@@ -32,8 +32,13 @@ export function renderVault() {
       <a href="#breakglass" onclick="document.querySelector('[data-tab=breakglass]').click();return false"
          style="color:inherit">Break-glass</a>.</div>` : ''
 
+  const reviewBanner = reviewDue(scopes.map(s => s.payload)) ? `
+    <div class="banner">Annual review: nothing here has changed in over a year.
+      Unlike the copy in the fireproof box, this record CAN stay current — re-confirm
+      who's named, refresh the scans, and Publish (even unchanged) to reset the clock.</div>` : ''
+
   el.innerHTML = `
-    ${kitBanner}
+    ${kitBanner}${reviewBanner}
     <div class="newbar">
       <span class="msg">Add to your record:</span>
       ${missingTemplates().map(t => `<button data-tpl="${t.id}" title="${esc(t.hint)}">+ ${esc(t.name)}</button>`).join('')}
