@@ -108,13 +108,14 @@ export async function sendReleaseWarning(relay, escrowSigner, contactPub, { owne
   return relay.publish(await wrapRumor(s, contactPub, rumor))
 }
 
-/** Challenge contact → escrow: veto. Resets the owner's liveness clock. */
-export async function sendVeto(relay, signer, escrowPub, ownerPub, reason = '') {
+/** Challenge contact → escrow: veto. Resets the owner's liveness clock.
+ *  `at` is injectable so tests can veto in simulated time. */
+export async function sendVeto(relay, signer, escrowPub, ownerPub, reason = '', at = now()) {
   const s = asSigner(signer)
   const rumor = {
     pubkey: await s.getPublicKey(),
     kind: KIND_APP,
-    created_at: now(),
+    created_at: at,
     tags: [['p', escrowPub]],
     content: JSON.stringify({ nherit_veto: 1, owner_pub: ownerPub, reason }),
   }

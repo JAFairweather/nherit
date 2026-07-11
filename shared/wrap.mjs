@@ -9,7 +9,11 @@
 import { finalizeEvent, generateSecretKey, getEventHash, nip44, verifyEvent } from 'nostr-tools'
 import { localSigner } from '../lib/nipxx.mjs'
 
-export const now = () => Math.floor(Date.now() / 1000)
+// Monotonic, like the lib's: two messages in the same second must not tie
+// on created_at — newest-wins ordering (deposit replacement, cancellation)
+// depends on strict ordering.
+let lastTs = 0
+export const now = () => (lastTs = Math.max(Math.floor(Date.now() / 1000), lastTs + 1))
 const fuzz = () => now() - Math.floor(Math.random() * 2 * 24 * 60 * 60)
 export const asSigner = (s) => s instanceof Uint8Array ? localSigner(s) : s
 

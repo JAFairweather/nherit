@@ -6,7 +6,7 @@
   "scripts": {
     "smoke": "node test/smoke.mjs",
     "smoke:local": "node test/smoke.mjs --local",
-    "escrow:test": "node test/escrow.mjs",
+    "escrow:test": "node test/escrow.mjs && node test/escrow-daemon.mjs",
     "shamir": "node test/shamir.mjs",
     "paper": "node test/paper.mjs",
     "invite": "node test/invite.mjs",
