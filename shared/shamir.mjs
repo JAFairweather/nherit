@@ -13,7 +13,7 @@
 // The split secret is the SCOPE key, never the owner key: a completed
 // ceremony opens one scope, not the estate.
 
-import slip39 from 'slip39'
+import slip39 from '../lib/vendor/slip39.mjs'
 import { KIND_DATA_SET } from '../lib/nipxx.mjs'
 import { asSigner, inbox, now, wrapRumor } from './wrap.mjs'
 

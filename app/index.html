@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#131510">
+<meta name="referrer" content="no-referrer">
+<title>Nherit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23191d14'/%3E%3Cpath d='M32 10 12 26v28h14V38h12v16h14V26z' fill='none' stroke='%239dbb72' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<script type="importmap">
+{
+  "imports": {
+    "nostr-tools": "https://esm.sh/nostr-tools@2.23.9?bundle",
+    "nostr-tools/pool": "https://esm.sh/nostr-tools@2.23.9/pool?bundle",
+    "nostr-tools/nip49": "https://esm.sh/nostr-tools@2.23.9/nip49?bundle",
+    "@noble/ciphers/chacha.js": "https://esm.sh/@noble/ciphers@2.2.0/chacha.js",
+    "@paulmillr/qr": "https://esm.sh/@paulmillr/qr@0.3.0",
+    "@paulmillr/qr/decode.js": "https://esm.sh/@paulmillr/qr@0.3.0/decode.js",
+    "@noble/hashes/pbkdf2.js": "https://esm.sh/@noble/hashes@2.0.1/pbkdf2.js",
+    "@noble/hashes/hmac.js": "https://esm.sh/@noble/hashes@2.0.1/hmac.js",
+    "@noble/hashes/sha2.js": "https://esm.sh/@noble/hashes@2.0.1/sha2.js"
+  }
+}
+</script>
+<style>
+  /* Nherit: heritage evergreen on parchment ink — an estate record, not a
+     feed. Semantics: green = act/live access, amber = escrowed/stale/bearer,
+     violet = paper shares (tier 3), red = revoke/destroy. */
+  :root {
+    --bg: #131510; --panel: #1a1e16; --panel2: #232a1e; --line: #333d2a;
+    --text: #e7e8da; --dim: #98a189;
+    --accent: #9dbb72; --accent-ink: #131b0c;
+    --ok: #8fc98f; --warn: #d9b048; --tier3: #b49fd9; --danger: #dd6a5a;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  #alpha { background: rgba(217,176,72,.1); color: var(--warn); text-align: center;
+    font-size: 12.5px; padding: 6px 14px; border-bottom: 1px solid rgba(217,176,72,.25); }
+  #alpha a { color: var(--warn); }
+  header { display: flex; align-items: baseline; gap: 14px; padding: 22px 28px 0;
+    max-width: 1080px; margin: 0 auto; }
+  header h1 { margin: 0; font-size: 26px; letter-spacing: -.5px; }
+  header h1 span { color: var(--accent); }
+  header .tag { color: var(--dim); font-size: 14px; }
+  header .spacer { flex: 1; }
+  main { max-width: 1080px; margin: 0 auto; padding: 16px 28px 60px; }
+
+  button { background: var(--panel2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px 15px; font: inherit; font-size: 14px; cursor: pointer;
+    transition: border-color .12s, color .12s; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent);
+    color: var(--accent-ink); font-weight: 650; }
+  button.primary:hover { filter: brightness(1.08); }
+  button.danger { color: var(--danger); border-color: rgba(221,106,90,.4); }
+  button.danger:hover { border-color: var(--danger); }
+  button.icon { width: 30px; height: 30px; padding: 0; display: inline-flex;
+    align-items: center; justify-content: center; color: var(--dim); }
+  button.icon:hover { color: var(--danger); border-color: var(--danger); }
+  input, select, textarea { background: var(--bg); border: 1px solid var(--line); color: var(--text);
+    border-radius: 8px; padding: 8px 12px; font: inherit; font-size: 14px; min-width: 0; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  textarea { width: 100%; resize: vertical; }
+
+  #login, #unlock, #recover { max-width: 600px; margin: 7vh auto 0; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+  #login h2, #unlock h2, #recover h2 { margin: 0 0 6px; }
+  #login p, #unlock p, #recover p { color: var(--dim); margin: 0 0 18px; }
+  .row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .row input { flex: 1; font-family: var(--mono); font-size: 13px; }
+  .alt { color: var(--dim); font-size: 13px; margin-top: 6px; }
+  .alt a { color: var(--accent); cursor: pointer; }
+  .err { color: var(--warn); margin-top: 12px; font-size: 13px; min-height: 1em; }
+  #protect { display: none; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: rgba(157,187,114,.08); border: 1px solid rgba(157,187,114,.35);
+    border-radius: 10px; padding: 10px 14px; font-size: 13px; margin: 0 0 14px; }
+  #protect input { font-size: 13px; }
+  #protect a { color: var(--dim); cursor: pointer; font-size: 12px; }
+  .phrase { background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; font-family: var(--mono); font-size: 14px; word-break: break-all;
+    margin: 16px 0 10px; user-select: all; }
+  p.warn { color: var(--warn); font-size: 13px; margin: 0 0 12px; }
+  #me { display: none; align-items: center; gap: 10px; color: var(--dim); font-size: 13px; }
+  #me code { font-family: var(--mono); color: var(--text); cursor: pointer; }
+
+  #tabs { display: none; gap: 4px; margin: 16px 0 14px; border-bottom: 1px solid var(--line);
+    flex-wrap: wrap; }
+  .tab { background: none; border: none; border-bottom: 2px solid transparent; border-radius: 0;
+    color: var(--dim); padding: 8px 16px; font-size: 15px; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tab .bub { background: var(--warn); color: var(--accent-ink); border-radius: 999px;
+    font-size: 11px; padding: 0 6px; margin-left: 6px; font-weight: 700; }
+  #status { color: var(--dim); font-size: 13px; min-height: 1.2em; margin-bottom: 14px; }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 18px 22px; margin-bottom: 16px; }
+  .card .head { display: flex; align-items: center; gap: 10px; }
+  .card .head .grow { flex: 1; }
+  .card .name { font-weight: 650; font-size: 17px; }
+  .meta { color: var(--dim); font-size: 12px; font-family: var(--mono); }
+  .note { color: var(--dim); font-size: 13px; }
+  .hint { color: var(--dim); font-size: 12.5px; font-style: italic; margin: 4px 0 8px; }
+  .badge { font-size: 11px; padding: 2px 9px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--dim); white-space: nowrap; }
+  .badge.live { border-color: var(--ok); color: var(--ok); }
+  .badge.stale { border-color: var(--warn); color: var(--warn); }
+  .badge.escrow { border-color: var(--warn); color: var(--warn); border-style: dashed; }
+  .badge.tier3 { border-color: var(--tier3); color: var(--tier3); }
+  .badge.draft { border-color: var(--warn); color: var(--warn); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; align-items: center; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+    background: var(--panel2); border: 1px solid var(--line); border-radius: 999px;
+    padding: 4px 6px 4px 12px; }
+  .chip.on { border-color: rgba(143,201,143,.55); color: var(--ok); }
+  .chip.escrow { border-color: rgba(217,176,72,.55); color: var(--warn); border-style: dashed; }
+  .chip.tier3 { border-color: rgba(180,159,217,.55); color: var(--tier3); }
+  .chip.invite { border-style: dashed; border-color: rgba(217,176,72,.55); color: var(--warn); }
+  .chip.claim { border-color: rgba(143,201,143,.55); color: var(--ok); }
+  .chip.ghost { border-style: dashed; color: var(--dim); cursor: pointer; padding: 4px 12px; }
+  .chip.ghost:hover { color: var(--accent); border-color: var(--accent); }
+  .chip .x { border: none; background: none; color: var(--dim); padding: 0 5px; font-size: 14px; cursor: pointer; }
+  .chip .x:hover { color: var(--danger); }
+  .chip .approve { border: none; background: none; color: var(--ok); padding: 0 5px;
+    font-size: 12px; text-decoration: underline; cursor: pointer; }
+  .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  .msg { font-size: 12px; color: var(--dim); }
+  .sect2 { font-size: 11px; text-transform: uppercase; letter-spacing: .8px;
+    color: var(--dim); margin-top: 12px; }
+  .empty { color: var(--dim); text-align: center; margin-top: 7vh; }
+  .banner { background: rgba(217,176,72,.1); border: 1px solid rgba(217,176,72,.35);
+    color: var(--warn); border-radius: 10px; padding: 10px 14px; font-size: 13px;
+    margin: 4px 0 16px; }
+  .banner.green { background: rgba(157,187,114,.08); border-color: rgba(157,187,114,.35);
+    color: var(--accent); }
+
+  /* the estate record: scopes as sections of ONE card */
+  .scope { border-top: 1px solid var(--line); padding: 16px 0 6px; }
+  .scope:first-of-type { border-top: none; }
+  .items { margin: 8px 0; }
+  .item { display: flex; gap: 10px; padding: 5px 0; align-items: baseline; }
+  .item .lbl { flex: 0 0 220px; color: var(--dim); font-size: 13px; }
+  .item .val { flex: 1; white-space: pre-wrap; word-break: break-word; }
+  .item input.lbl-in { flex: 0 0 220px; font-size: 13px; }
+  .item input.val-in, .item textarea.val-in { flex: 1; font-size: 13.5px; }
+  .docs { margin: 8px 0; }
+  .doc { display: flex; align-items: center; gap: 10px; padding: 6px 0;
+    border-bottom: 1px dashed var(--line); }
+  .doc:last-child { border-bottom: none; }
+  .doc .fname { flex: 1; }
+  .doc .fsize { color: var(--dim); font-size: 12px; }
+  .doc a { color: var(--accent); cursor: pointer; }
+  .drop { border: 2px dashed var(--line); border-radius: 12px; padding: 14px;
+    text-align: center; color: var(--dim); margin: 8px 0; cursor: pointer; font-size: 13px; }
+  .drop.over, .drop:hover { border-color: var(--accent); color: var(--text); }
+  .newbar { display: flex; gap: 10px; margin: 4px 0 18px; flex-wrap: wrap; align-items: center; }
+  .person { display: flex; gap: 14px; }
+  .person .who { flex: 0 0 240px; }
+  .person .who .rel { color: var(--dim); font-size: 12.5px; }
+  .person .access { flex: 1; }
+  datalist { display: none; }
+  .kv { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  .kv label { color: var(--dim); font-size: 13px; min-width: 170px; }
+  .kv input[type=number] { width: 90px; }
+  .kv input.wide { flex: 1; font-family: var(--mono); font-size: 12.5px; }
+  .timeline { font-size: 13px; color: var(--dim); margin: 10px 0; line-height: 1.8; }
+  .timeline b { color: var(--text); }
+  .cere textarea { font-family: var(--mono); font-size: 13px; }
+  video#scanner { width: 100%; max-width: 420px; border-radius: 12px; display: none; }
+  .row.cfg { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .row.cfg input[class$="-url"] { flex: 1; font-family: var(--mono); font-size: 12.5px; }
+  .managed { display: flex; align-items: center; gap: 5px; color: var(--dim);
+    font-size: 12px; white-space: nowrap; cursor: pointer; }
+
+  #printcard { display: none; }
+  @media print {
+    body > :not(#printcard) { display: none !important; }
+    body { background: #fff; }
+    #printcard { display: block; }
+    /* sheet styles injected by paperkit.mjs from shared/paper.mjs PRINT_CSS */
+  }
+</style>
+</head>
+<body>
+<div id="alpha">alpha — built on draft NIP-DA (<a href="https://github.com/nostr-protocol/nips/pull/2411">review pending</a>);
+  kind numbers may change. Use throwaway keys. This is not legal advice and not a will —
+  Nherit stores and delivers; your will stays with your attorney.
+  <a href="https://github.com/JAFairweather/nherit">code</a></div>
+<header>
+  <h1>N<span>herit</span></h1>
+  <div class="tag">the will that stays current</div>
+  <div class="spacer"></div>
+  <div id="me">
+    <code id="my-npub" title="click to copy"></code>
+    <button id="checkin" title="publish a liveness heartbeat for the dead-man's switch">Check in</button>
+    <button id="refresh">Refresh</button>
+    <button id="logout">Log out</button>
+  </div>
+</header>
+<main>
+  <section id="login">
+    <h2>Open your vault</h2>
+    <p>One encrypted estate record, maintained by you, shared scope by scope.
+       Everything is encrypted in this browser; relays store only ciphertext.
+       Your key is the vault — there is no account and no company to call.
+       That's the point.</p>
+    <div class="row">
+      <button class="primary" id="nip07" style="flex:1">Sign in with extension (NIP-07)</button>
+    </div>
+    <div class="row">
+      <input id="nsec" placeholder="…or paste nsec1… / hex" autocomplete="off">
+      <button id="go">Open</button>
+    </div>
+    <div class="alt">New here? <a id="gen">Create your vault key</a> ·
+      Holding a paper sheet? <a id="show-recover">Recover from paper</a></div>
+    <div id="newkey" style="display:none">
+      <div class="phrase" id="newkey-nsec"></div>
+      <p class="warn">This key IS the vault. Write it down or print it — no reset, no server copy.</p>
+      <div class="row">
+        <button id="newkey-copy">Copy</button>
+        <button id="newkey-print" title="print a paper recovery card">Print</button>
+        <button class="primary" id="newkey-continue" style="flex:1">Continue</button>
+      </div>
+    </div>
+    <div class="err" id="err"></div>
+  </section>
+
+  <section id="recover" style="display:none">
+    <h2>Recover from paper</h2>
+    <p>Scan or type the locked key (ncryptsec1…) from a recovery sheet, then
+       enter its passphrase. Works for an owner sheet or a beneficiary sheet —
+       everything reconstitutes from the key alone.</p>
+    <div class="row">
+      <input id="rec-ncryptsec" placeholder="ncryptsec1…" autocomplete="off">
+      <button id="rec-scan">Scan QR</button>
+    </div>
+    <video id="scanner" muted playsinline></video>
+    <div class="row">
+      <input id="rec-pass" type="password" placeholder="passphrase" autocomplete="off">
+      <button class="primary" id="rec-go">Unlock</button>
+    </div>
+    <div class="alt"><a id="rec-back">← back</a></div>
+    <div class="err" id="rec-err"></div>
+  </section>
+
+  <section id="unlock" style="display:none">
+    <h2>Unlock your vault</h2>
+    <p>Your key is stored on this device encrypted with a passphrase (NIP-49).
+       It is decrypted here in the browser and never leaves it.</p>
+    <div class="row">
+      <input id="unlock-pass" type="password" placeholder="passphrase" autocomplete="current-password">
+      <button class="primary" id="unlock-go">Unlock</button>
+    </div>
+    <div class="alt"><a id="unlock-forget">Forget this key on this device</a> —
+      you will need the nsec or a paper sheet to get back in.</div>
+    <div class="err" id="unlock-err"></div>
+  </section>
+
+  <div id="protect">
+    <span><b>Protect this key on this device?</b> Store it passphrase-encrypted
+      (NIP-49) in this browser — nothing else is persisted.</span>
+    <input id="protect-pass" type="password" placeholder="passphrase (8+ chars)" autocomplete="new-password">
+    <button id="protect-go">Protect</button>
+    <a id="protect-skip">not now</a>
+    <span class="msg" id="protect-msg"></span>
+  </div>
+
+  <nav id="tabs">
+    <button class="tab active" data-tab="vault">My record</button>
+    <button class="tab" data-tab="people">People</button>
+    <button class="tab" data-tab="breakglass">Break-glass</button>
+    <button class="tab" data-tab="received">Shared with you<span id="recv-bub"></span></button>
+    <button class="tab" data-tab="settings">Settings</button>
+  </nav>
+  <div id="status"></div>
+  <section id="vault" style="display:none"></section>
+  <section id="people" style="display:none"></section>
+  <section id="breakglass" style="display:none"></section>
+  <section id="received" style="display:none"></section>
+  <section id="settings" style="display:none"></section>
+  <section id="invite" style="display:none"></section>
+</main>
+<div id="printcard" aria-hidden="true"></div>
+<script type="module" src="main.mjs"></script>
+</body>
+</html>
