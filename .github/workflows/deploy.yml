@@ -1,0 +1,24 @@
+name: Deploy to GitHub Pages
+# Pages serves the gh-pages branch (auto-enabled when that branch first
+# appeared). This mirrors main to gh-pages on every push — the workflow
+# token can't enable Pages via the API on this repo, so the actions/
+# deploy-pages method is not usable here.
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mirror main to gh-pages
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -B gh-pages
+          git push -f origin gh-pages
