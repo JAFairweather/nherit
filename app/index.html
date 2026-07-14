@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#131510">
+<meta name="theme-color" content="#141110">
 <meta name="referrer" content="no-referrer">
 <title>Nherit</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%20role%3D%22img%22%20aria-label%3D%22Nave%22%3E%20%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2230%22%20height%3D%2230%22%20rx%3D%227%22%20fill%3D%22%230b0906%22%20stroke%3D%22%23c0705a%22%20stroke-opacity%3D%220.5%22%20stroke-width%3D%221.2%22%2F%3E%20%3Cg%20transform%3D%22translate(4%204)%22%20fill%3D%22none%22%20stroke%3D%22%23c0705a%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%20%3Ccircle%20cx%3D%228%22%20cy%3D%2212%22%20r%3D%224%22%2F%3E%3Cpath%20d%3D%22M12%2012%20H21%22%2F%3E%3Cpath%20d%3D%22M17%2012%20V15.5%22%2F%3E%3Cpath%20d%3D%22M20%2012%20V15.5%22%2F%3E%20%3C%2Fg%3E%20%3C%2Fsvg%3E" type="image/svg+xml">
@@ -23,58 +23,110 @@
 }
 </script>
 <style>
-  /* Nherit: heritage evergreen on parchment ink — an estate record, not a
-     feed. Semantics: green = act/live access, amber = escrowed/stale/bearer,
-     violet = paper shares (tier 3), red = revoke/destroy. */
+  /* ─── The Nave design system ──────────────────────────────────────────
+     Shared ink/gold tokens + a per-app accent (Nherit = terracotta, its
+     seal). Sans-serif throughout: proportional sans for text, a clean sans
+     monospace for labels/keys. Semantics: accent = the app's act,
+     ok/green = live/sharing, amber = escrowed/stale, violet = paper shares
+     (tier 3), red = revoke/destroy. */
   :root {
-    --bg: #131510; --panel: #1a1e16; --panel2: #232a1e; --line: #333d2a;
-    --text: #e7e8da; --dim: #98a189;
-    --accent: #9dbb72; --accent-ink: #131b0c;
-    --ok: #8fc98f; --warn: #d9b048; --tier3: #b49fd9; --danger: #dd6a5a;
-    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+    --ink: #0b0906; --bg: #0b0906; --panel: #14100a; --panel2: #1b1409; --line: #2a2317;
+    --text: #f4efe4; --dim: #9c927f;
+    --gold: #c39a56; --gold-bright: #e2c079;
+    --accent: #c0705a; --accent-bright: #d38b76; --accent-ink: #1c0d08;
+    --ok: #8fae6a; --warn: #d9a648; --tier3: #b49fd9; --danger: #c0705a;
+    --alby: #ffdf6f; --alby-bright: #ffe98c; --alby-ink: #1c1400;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace;
+    --serif: var(--sans);   /* the family is sans-serif now; alias kept for any legacy refs */
+    --radius: 6px;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text);
-    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-  #alpha { background: rgba(217,176,72,.1); color: var(--warn); text-align: center;
-    font-size: 12.5px; padding: 6px 14px; border-bottom: 1px solid rgba(217,176,72,.25); }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 var(--serif); -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(1100px 620px at 50% -10%, color-mix(in srgb, var(--gold) 7%, transparent), transparent 70%);
+    background-attachment: fixed;
+  }
+  #alpha {
+    background: rgba(217, 166, 72, 0.09); color: var(--warn);
+    text-align: center; font-size: 13.5px; padding: 10px 16px; font-family: var(--mono);
+    letter-spacing: 0.03em; line-height: 1.5; border-bottom: 1px solid rgba(217, 166, 72, 0.22);
+  }
   #alpha a { color: var(--warn); }
-  header { display: flex; align-items: baseline; gap: 14px; padding: 22px 28px 0;
-    max-width: 1080px; margin: 0 auto; }
-  header h1 { margin: 0; font-size: 26px; letter-spacing: -.5px; }
-  header h1 span { color: var(--accent); }
-  header .tag { color: var(--dim); font-size: 14px; }
-  header .spacer { flex: 1; }
-  main { max-width: 1080px; margin: 0 auto; padding: 16px 28px 60px; }
 
-  button { background: var(--panel2); color: var(--text); border: 1px solid var(--line);
-    border-radius: 8px; padding: 8px 15px; font: inherit; font-size: 14px; cursor: pointer;
-    transition: border-color .12s, color .12s; }
-  button:hover { border-color: var(--accent); }
-  button.primary { background: var(--accent); border-color: var(--accent);
-    color: var(--accent-ink); font-weight: 650; }
-  button.primary:hover { filter: brightness(1.08); }
-  button.danger { color: var(--danger); border-color: rgba(221,106,90,.4); }
-  button.danger:hover { border-color: var(--danger); }
-  button.icon { width: 30px; height: 30px; padding: 0; display: inline-flex;
-    align-items: center; justify-content: center; color: var(--dim); }
-  button.icon:hover { color: var(--danger); border-color: var(--danger); }
-  input, select, textarea { background: var(--bg); border: 1px solid var(--line); color: var(--text);
-    border-radius: 8px; padding: 8px 12px; font: inherit; font-size: 14px; min-width: 0; }
-  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  /* ── header: seal · wordmark · tagline ───────────────────────────────── */
+  header {
+    display: flex; align-items: center; gap: 14px; padding: 26px 28px 0;
+    max-width: 1180px; margin: 0 auto;
+  }
+  header .brand-seal { width: 58px; height: 58px; flex: none; }
+  header .brand-seal svg { width: 100%; height: 100%; display: block; }
+  header h1 {
+    margin: 0; font-family: var(--sans); font-weight: 800; font-size: 27px;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--text); align-self: center;
+  }
+  header h1 span { color: var(--accent); }
+  header .tag {
+    color: var(--dim); font-family: var(--sans); font-size: 12px; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase; align-self: center;
+  }
+  header .spacer { flex: 1; }
+  main { max-width: 1180px; margin: 0 auto; padding: 22px 28px 60px; }
+
+  /* ── buttons: sans, bordered, accent on commit ──────────────────────── */
+  button {
+    background: transparent; color: var(--text); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 9px 16px; font-family: var(--sans);
+    font-size: 13px; font-weight: 600; letter-spacing: 0.02em; cursor: pointer;
+    transition: border-color 0.14s, color 0.14s, background 0.14s;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent-bright); }
+  button.primary {
+    background: var(--accent); border-color: var(--accent); color: var(--accent-ink);
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  button.primary:hover { background: var(--accent-bright); border-color: var(--accent-bright); color: var(--accent-ink); }
+  button.danger { color: var(--danger); border-color: rgba(192,112,90,.4); }
+  button.danger:hover { color: var(--danger); border-color: var(--danger); background: none; }
+  button.icon {
+    width: 32px; height: 32px; padding: 0; display: inline-flex;
+    align-items: center; justify-content: center; color: var(--dim);
+  }
+  button.icon:hover { color: var(--danger); border-color: var(--danger); background: none; }
+  input, select, textarea {
+    background: var(--bg); border: 1px solid var(--line); color: var(--text);
+    border-radius: var(--radius); padding: 10px 12px; font-family: var(--sans);
+    font-size: 14px; min-width: 0;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent) !important; }
   textarea { width: 100%; resize: vertical; }
 
-  #login, #unlock, #recover { max-width: 600px; margin: 7vh auto 0; background: var(--panel);
-    border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
-  #login h2, #unlock h2, #recover h2 { margin: 0 0 6px; }
-  #login p, #unlock p, #recover p { color: var(--dim); margin: 0 0 18px; }
+  /* ── the Alby sign-in bar (NIP-07 via window.nostr, Alby branding) ──── */
+  .alby-bar {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 18px; font-size: 15px; font-weight: 700; letter-spacing: 0.01em;
+    background: var(--alby); border-color: var(--alby); color: var(--alby-ink); text-transform: none;
+  }
+  .alby-bar:hover { background: var(--alby-bright); border-color: var(--alby-bright); color: var(--alby-ink); }
+  .alby-bar .alby-mark { width: 24px; height: 24px; flex: none; }
+  .alby-sub { text-align: center; color: var(--dim); font-size: 12px; margin: 10px 0 0; }
+
+  /* ── login / unlock / recover ───────────────────────────────────────── */
+  #login, #unlock, #recover {
+    max-width: 600px; margin: 9vh auto 0; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px; padding: 30px;
+    box-shadow: 0 30px 70px -46px #000;
+  }
+  #login h2, #unlock h2, #recover h2 { margin: 0 0 6px; font-family: var(--sans); font-weight: 700; font-size: 19px; letter-spacing: 0.02em; }
+  #login p, #unlock p, #recover p { color: var(--dim); margin: 0 0 20px; }
   .row { display: flex; gap: 10px; margin-bottom: 10px; }
   .row input { flex: 1; font-family: var(--mono); font-size: 13px; }
-  .alt { color: var(--dim); font-size: 13px; margin-top: 6px; }
+  .alt { color: var(--dim); font-size: 14px; margin-top: 16px; }
   .alt a { color: var(--accent); cursor: pointer; }
-  .err { color: var(--warn); margin-top: 12px; font-size: 13px; min-height: 1em; }
+  .err { color: var(--warn); margin-top: 12px; font-size: 13px; min-height: 1em; font-family: var(--mono); }
   #protect { display: none; align-items: center; gap: 10px; flex-wrap: wrap;
-    background: rgba(157,187,114,.08); border: 1px solid rgba(157,187,114,.35);
+    background: color-mix(in srgb, var(--accent) 8%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
     border-radius: 10px; padding: 10px 14px; font-size: 13px; margin: 0 0 14px; }
   #protect input { font-size: 13px; }
   #protect a { color: var(--dim); cursor: pointer; font-size: 12px; }
@@ -82,43 +134,47 @@
     padding: 14px 16px; font-family: var(--mono); font-size: 14px; word-break: break-all;
     margin: 16px 0 10px; user-select: all; }
   p.warn { color: var(--warn); font-size: 13px; margin: 0 0 12px; }
-  #me { display: none; align-items: center; gap: 10px; color: var(--dim); font-size: 13px; }
+  #me { display: none; align-items: center; gap: 10px; color: var(--dim); font-size: 12px; font-family: var(--mono); }
   #me code { font-family: var(--mono); color: var(--text); cursor: pointer; }
 
-  #tabs { display: none; gap: 4px; margin: 16px 0 14px; border-bottom: 1px solid var(--line);
+  /* ── tabs ───────────────────────────────────────────────────────────── */
+  #tabs { display: none; gap: 4px; margin: 20px 0 14px; border-bottom: 1px solid var(--line);
     flex-wrap: wrap; }
   .tab { background: none; border: none; border-bottom: 2px solid transparent; border-radius: 0;
-    color: var(--dim); padding: 8px 16px; font-size: 15px; }
+    color: var(--dim); padding: 9px 16px; font-family: var(--sans); font-size: 13.5px; font-weight: 600;
+    letter-spacing: 0.02em; }
   .tab:hover { color: var(--text); }
   .tab.active { color: var(--text); border-bottom-color: var(--accent); }
   .tab .bub { background: var(--warn); color: var(--accent-ink); border-radius: 999px;
     font-size: 11px; padding: 0 6px; margin-left: 6px; font-weight: 700; }
-  #status { color: var(--dim); font-size: 13px; min-height: 1.2em; margin-bottom: 14px; }
+  #status { color: var(--dim); font-size: 13px; min-height: 1.2em; margin-bottom: 14px; font-family: var(--mono); }
 
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
-    padding: 18px 22px; margin-bottom: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px 22px; margin-bottom: 16px;
+    transition: border-color 0.16s, transform 0.16s; }
+  .card:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
   .card .head { display: flex; align-items: center; gap: 10px; }
   .card .head .grow { flex: 1; }
-  .card .name { font-weight: 650; font-size: 17px; }
+  .card .name { font-weight: 600; font-size: 17px; font-family: var(--serif); }
   .meta { color: var(--dim); font-size: 12px; font-family: var(--mono); }
   .note { color: var(--dim); font-size: 13px; }
   .hint { color: var(--dim); font-size: 12.5px; font-style: italic; margin: 4px 0 8px; }
-  .badge { font-size: 11px; padding: 2px 9px; border-radius: 999px;
-    border: 1px solid var(--line); color: var(--dim); white-space: nowrap; }
+  .badge { font-size: 10.5px; padding: 3px 9px; border-radius: 999px; font-family: var(--mono);
+    letter-spacing: 0.06em; border: 1px solid var(--line); color: var(--dim); white-space: nowrap; }
   .badge.live { border-color: var(--ok); color: var(--ok); }
   .badge.stale { border-color: var(--warn); color: var(--warn); }
   .badge.escrow { border-color: var(--warn); color: var(--warn); border-style: dashed; }
   .badge.tier3 { border-color: var(--tier3); color: var(--tier3); }
   .badge.draft { border-color: var(--warn); color: var(--warn); }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; align-items: center; }
-  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-family: var(--mono);
     background: var(--panel2); border: 1px solid var(--line); border-radius: 999px;
     padding: 4px 6px 4px 12px; }
-  .chip.on { border-color: rgba(143,201,143,.55); color: var(--ok); }
-  .chip.escrow { border-color: rgba(217,176,72,.55); color: var(--warn); border-style: dashed; }
-  .chip.tier3 { border-color: rgba(180,159,217,.55); color: var(--tier3); }
-  .chip.invite { border-style: dashed; border-color: rgba(217,176,72,.55); color: var(--warn); }
-  .chip.claim { border-color: rgba(143,201,143,.55); color: var(--ok); }
+  .chip.on { border-color: var(--ok); color: var(--ok); }
+  .chip.escrow { border-color: color-mix(in srgb, var(--warn) 55%, transparent); color: var(--warn); border-style: dashed; }
+  .chip.tier3 { border-color: color-mix(in srgb, var(--tier3) 55%, transparent); color: var(--tier3); }
+  .chip.invite { border-style: dashed; border-color: color-mix(in srgb, var(--warn) 55%, transparent); color: var(--warn); }
+  .chip.claim { border-color: var(--ok); color: var(--ok); }
   .chip.ghost { border-style: dashed; color: var(--dim); cursor: pointer; padding: 4px 12px; }
   .chip.ghost:hover { color: var(--accent); border-color: var(--accent); }
   .chip .x { border: none; background: none; color: var(--dim); padding: 0 5px; font-size: 14px; cursor: pointer; }
@@ -126,14 +182,14 @@
   .chip .approve { border: none; background: none; color: var(--ok); padding: 0 5px;
     font-size: 12px; text-decoration: underline; cursor: pointer; }
   .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
-  .msg { font-size: 12px; color: var(--dim); }
-  .sect2 { font-size: 11px; text-transform: uppercase; letter-spacing: .8px;
+  .msg { font-size: 12px; color: var(--dim); font-family: var(--mono); }
+  .sect2 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
     color: var(--dim); margin-top: 12px; }
-  .empty { color: var(--dim); text-align: center; margin-top: 7vh; }
-  .banner { background: rgba(217,176,72,.1); border: 1px solid rgba(217,176,72,.35);
+  .empty { color: var(--dim); text-align: center; margin-top: 8vh; }
+  .banner { background: rgba(217, 166, 72, 0.09); border: 1px solid rgba(217, 166, 72, 0.35);
     color: var(--warn); border-radius: 10px; padding: 10px 14px; font-size: 13px;
     margin: 4px 0 16px; }
-  .banner.green { background: rgba(157,187,114,.08); border-color: rgba(157,187,114,.35);
+  .banner.green { background: color-mix(in srgb, var(--accent) 8%, transparent); border-color: color-mix(in srgb, var(--accent) 35%, transparent);
     color: var(--accent); }
 
   /* the estate record: scopes as sections of ONE card */
@@ -150,9 +206,9 @@
     border-bottom: 1px dashed var(--line); }
   .doc:last-child { border-bottom: none; }
   .doc .fname { flex: 1; }
-  .doc .fsize { color: var(--dim); font-size: 12px; }
+  .doc .fsize { color: var(--dim); font-size: 12px; font-family: var(--mono); }
   .doc a { color: var(--accent); cursor: pointer; }
-  .drop { border: 2px dashed var(--line); border-radius: 12px; padding: 14px;
+  .drop { border: 2px dashed var(--line); border-radius: 10px; padding: 14px;
     text-align: center; color: var(--dim); margin: 8px 0; cursor: pointer; font-size: 13px; }
   .drop.over, .drop:hover { border-color: var(--accent); color: var(--text); }
   .newbar { display: flex; gap: 10px; margin: 4px 0 18px; flex-wrap: wrap; align-items: center; }
@@ -167,8 +223,8 @@
   .kv input.wide { flex: 1; font-family: var(--mono); font-size: 12.5px; }
   .timeline { font-size: 13px; color: var(--dim); margin: 10px 0; line-height: 1.8; }
   .timeline b { color: var(--text); }
-  .cere textarea { font-family: var(--mono); font-size: 13px; }
-  video#scanner { width: 100%; max-width: 420px; border-radius: 12px; display: none; }
+  .cere textarea { font-family: var(--sans); font-size: 13px; }
+  video#scanner { width: 100%; max-width: 420px; border-radius: 10px; display: none; }
   .row.cfg { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
   .row.cfg input[class$="-url"] { flex: 1; font-family: var(--mono); font-size: 12.5px; }
   .managed { display: flex; align-items: center; gap: 5px; color: var(--dim);
@@ -189,6 +245,10 @@
   Nherit stores and delivers; your will stays with your attorney.
   <a href="https://github.com/JAFairweather/nherit">code</a></div>
 <header>
+  <span class="brand-seal"><svg viewBox="0 0 32 32" role="img" aria-label="Nherit">
+    <rect x="1" y="1" width="30" height="30" rx="7" fill="#0b0906" stroke="#c0705a" stroke-opacity=".5" stroke-width="1.2"/>
+    <g transform="translate(4 4)" fill="none" stroke="#c0705a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="4"/><path d="M12 12 H21"/><path d="M17 12 V15.5"/><path d="M20 12 V15.5"/></g>
+  </svg></span>
   <h1>N<span>herit</span></h1>
   <div class="tag">the will that stays current</div>
   <div class="spacer"></div>
@@ -206,10 +266,16 @@
        Everything is encrypted in this browser; relays store only ciphertext.
        Your key is the vault — there is no account and no company to call.
        That's the point.</p>
-    <div class="row">
-      <button class="primary" id="nip07" style="flex:1">Sign in with extension (NIP-07)</button>
-    </div>
-    <div class="row">
+    <button class="primary alby-bar" id="nip07"><span class="alby-mark"><svg viewBox="0 0 28 28" fill="none" aria-hidden="true">
+      <ellipse cx="9.5" cy="9" rx="3.6" ry="5.4" fill="#1c1400" fill-opacity=".22" transform="rotate(-22 9.5 9)"/>
+      <ellipse cx="18.5" cy="9" rx="3.6" ry="5.4" fill="#1c1400" fill-opacity=".22" transform="rotate(22 18.5 9)"/>
+      <ellipse cx="14" cy="16" rx="6" ry="7.4" fill="#1c1400"/>
+      <path d="M8.6 14 H19.4 M8.6 17.6 H19.4 M10.4 21 H17.6" stroke="#ffdf6f" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M12 8.2 L10.4 4.4 M16 8.2 L17.6 4.4" stroke="#1c1400" stroke-width="1.3" stroke-linecap="round"/>
+      <circle cx="10.2" cy="3.8" r="1.05" fill="#1c1400"/><circle cx="17.8" cy="3.8" r="1.05" fill="#1c1400"/>
+    </svg></span> Sign in with Alby</button>
+    <div class="alby-sub">works with any NIP-07 signer — Alby · nos2x · Amber</div>
+    <div class="row" style="margin-top:18px">
       <input id="nsec" placeholder="…or paste nsec1… / hex" autocomplete="off">
       <button id="go">Open</button>
     </div>
@@ -284,5 +350,56 @@
 </main>
 <div id="printcard" aria-hidden="true"></div>
 <script type="module" src="main.mjs"></script>
+
+<!-- The common Nave footer — identical on every app. -->
+<style>
+  .nave-footer { background:#0b0906; border-top:1px solid #2a2317; color:#7a6f5c;
+    font-family:ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; padding:38px 24px; margin-top:56px; }
+  .nave-footer .nf-wrap { max-width:1040px; margin:0 auto; display:flex; flex-direction:column;
+    align-items:center; text-align:center; gap:18px; }
+  .nave-footer a { text-decoration:none; }
+  .nf-brand { display:inline-flex; align-items:center; gap:10px; font-size:13px;
+    letter-spacing:.16em; text-transform:uppercase; color:#c39a56; }
+  .nf-brand:hover { color:#e2c079; }
+  .nf-brand svg { width:22px; height:22px; flex:none; }
+  .nf-apps { display:flex; flex-wrap:wrap; gap:8px 16px; justify-content:center;
+    font-size:12px; letter-spacing:.08em; }
+  .nf-apps a { color:#9c927f; }
+  .nf-apps a:hover { color:#e2c079; }
+  .nf-apps .here { color:#f4efe4; border-bottom:1px solid #c39a56; }
+  .nf-meta { display:flex; flex-wrap:wrap; gap:8px 18px; justify-content:center;
+    align-items:center; font-size:12px; }
+  .nf-meta a { color:#c39a56; }
+  .nf-meta a:hover { color:#e2c079; }
+  .nf-npub { font-size:11px; color:#6f6553; word-break:break-all; }
+  .nf-whisper { font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-style:italic; font-size:13px; color:#6f6553; }
+</style>
+<footer class="nave-footer">
+  <div class="nf-wrap">
+    <a class="nf-brand" href="https://nave.pub">
+      <svg viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <circle cx="50" cy="50" r="46" stroke="#c39a56" stroke-width="2" opacity="0.5"/>
+        <path d="M50 6 L57 43 L94 50 L57 57 L50 94 L43 57 L6 50 L43 43 Z" fill="#c39a56" fill-opacity="0.16" stroke="#c39a56" stroke-width="2"/>
+        <circle cx="50" cy="50" r="4" fill="#e2c079"/>
+      </svg>
+      A nave.pub project
+    </a>
+    <nav class="nf-apps">
+      <a href="https://noir.nave.pub">Noir</a>
+      <a href="https://nontact.nave.pub">Nontact</a>
+      <a href="https://nvelope.nave.pub">Nvelope</a>
+      <a class="here" href="https://nherit.nave.pub">Nherit</a>
+      <a href="https://ntrigue.nave.pub">Ntrigue</a>
+      <a href="https://notegate.nave.pub">Notegate</a>
+      <a href="https://nvoy.nave.pub">Nvoy</a>
+      <a href="https://nscope.nave.pub">Nscope</a>
+    </nav>
+    <div class="nf-meta">
+      <a href="mailto:help@nave.pub">help@nave.pub</a>
+      <span class="nf-npub">npub1gqg2csuzqmwpqqvts99786spefkf90xz96t3n6zp6fqnk2r74pxs4tcgrg</span>
+    </div>
+    <div class="nf-whisper">Identity = Freedom · your data answers to your keys, and no one else's.</div>
+  </div>
+</footer>
 </body>
 </html>
