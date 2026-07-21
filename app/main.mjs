@@ -100,8 +100,10 @@ export async function login(signer, remember) {
   const npub = nip19.npubEncode(state.me)
   $('my-npub').textContent = npub.slice(0, 12) + '…' + npub.slice(-4)
   $('my-npub').onclick = () => navigator.clipboard.writeText(npub)
-  $('me-kind').textContent =
-    { nip07: 'extension', nip46: 'bunker', local: 'local key' }[signer.kind] ?? 'local key'
+  const kindLabel = { nip07: 'extension', nip46: 'bunker', local: 'local key' }[signer.kind] ?? 'local key'
+  $('me-kind').textContent = kindLabel
+  $('me-kind').className = 'ntb-badge ' +   // nave-titlebar per-kind badge colour
+    ({ extension: 'ntb-kind-extension', bunker: 'ntb-kind-bunker', 'local key': 'ntb-kind-local' }[kindLabel] ?? '')
   if (remember && parseSession(remember)?.kind === 'local') offerProtect(remember)
   load()
 }
