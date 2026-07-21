@@ -56,23 +56,8 @@
   }
   #alpha a { color: var(--warn); }
 
-  /* ── header: seal · wordmark · tagline ───────────────────────────────── */
-  header {
-    display: flex; align-items: center; gap: 14px; padding: 26px 28px 0;
-    max-width: 1180px; margin: 0 auto;
-  }
-  header .brand-seal { width: 58px; height: 58px; flex: none; }
-  header .brand-seal svg { width: 100%; height: 100%; display: block; }
-  header h1 {
-    margin: 0; font-family: var(--sans); font-weight: 800; font-size: 27px;
-    letter-spacing: 0.14em; text-transform: uppercase; color: var(--text); align-self: center;
-  }
-  header h1 span { color: var(--accent); }
-  header .tag {
-    color: var(--dim); font-family: var(--sans); font-size: 12px; font-weight: 500;
-    letter-spacing: 0.08em; text-transform: uppercase; align-self: center;
-  }
-  header .spacer { flex: 1; }
+  /* ── header: the unified Nave title bar — the static component block
+     pasted before <main> carries its own styles (nave-titlebar-style). ── */
   main { max-width: 1180px; margin: 0 auto; padding: 22px 28px 60px; }
 
   /* ── buttons: sans, bordered, accent on commit ──────────────────────── */
@@ -135,8 +120,6 @@
     padding: 14px 16px; font-family: var(--mono); font-size: 14px; word-break: break-all;
     margin: 16px 0 10px; user-select: all; }
   p.warn { color: var(--warn); font-size: 13px; margin: 0 0 12px; }
-  #me { display: none; align-items: center; gap: 10px; color: var(--dim); font-size: 12px; font-family: var(--mono); }
-  #me code { font-family: var(--mono); color: var(--text); cursor: pointer; }
 
   /* ── tabs ───────────────────────────────────────────────────────────── */
   #tabs { display: none; gap: 4px; margin: 20px 0 14px; border-bottom: 1px solid var(--line);
@@ -245,20 +228,83 @@
   kind numbers may change. Use throwaway keys. This is not legal advice and not a will —
   Nherit stores and delivers; your will stays with your attorney.
   <a href="https://github.com/JAFairweather/nherit">code</a></div>
-<header>
-  <span class="brand-seal"><svg viewBox="0 0 32 32" role="img" aria-label="Nherit">
-    <rect x="1" y="1" width="30" height="30" rx="7" fill="#0b0906" stroke="#c0705a" stroke-opacity=".5" stroke-width="1.2"/>
-    <g transform="translate(4 4)" fill="none" stroke="#c0705a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="4"/><path d="M12 12 H21"/><path d="M17 12 V15.5"/><path d="M20 12 V15.5"/></g>
-  </svg></span>
-  <h1>N<span>herit</span></h1>
-  <div class="tag">the will that stays current</div>
-  <div class="spacer"></div>
-  <div id="me">
-    <span class="badge" id="me-kind" title="how this session signs"></span>
-    <code id="my-npub" title="click to copy"></code>
-    <button id="checkin" title="publish a liveness heartbeat for the dead-man's switch">Check in</button>
-    <button id="refresh">Refresh</button>
-    <button id="logout">Log out</button>
+<!-- The unified Nave title bar (nact#16) — static block pasted from
+     nave.pub/components/nave-titlebar.html @ 6516d86 (same paste-in posture
+     as the common footer below; keep the <style> in lock-step when syncing).
+     The fleet ids (#me, #me-kind, #my-npub, #refresh, #logout) survive, so
+     main.mjs's by-id wiring is unchanged. Two app-local deviations: the
+     Nherit-specific #checkin button rides inside the #me cluster (dead-man's
+     switch heartbeat), and the optional sign-in slot is omitted — the login
+     card in <main> is this app's sign-in affordance. -->
+<style id="nave-titlebar-style">
+  .nave-titlebar { position: sticky; top: 0; z-index: 20;
+    border-bottom: 1px solid var(--line, #2a2317);
+    background: var(--bg, #0b0906);
+    background: color-mix(in srgb, var(--bg, #0b0906) 86%, transparent);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    color: var(--text, #f4efe4);
+    font-family: var(--sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif); }
+  .nave-titlebar .ntb-bar { display: flex; align-items: center; gap: 13px;
+    max-width: 1080px; margin: 0 auto; padding: 13px 28px; }
+  .nave-titlebar .ntb-seal { width: 40px; height: 40px; flex: none; }
+  .nave-titlebar .ntb-seal:empty { display: none; }
+  .nave-titlebar .ntb-seal svg { width: 100%; height: 100%; display: block; }
+  .nave-titlebar .ntb-name { margin: 0; font-weight: 800; font-size: 21px;
+    letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent, #c39a56); }
+  .nave-titlebar .ntb-name::first-letter { color: var(--text, #f4efe4); }
+  .nave-titlebar .ntb-tag { color: var(--dim, #9c927f); font-size: 11.5px; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding-left: 13px; border-left: 1px solid var(--line, #2a2317); }
+  .nave-titlebar .ntb-tag:empty { display: none; }
+  .nave-titlebar .ntb-spacer { flex: 1; }
+  .nave-titlebar .ntb-me, .nave-titlebar .ntb-signin { display: flex; align-items: center; gap: 10px; }
+  .nave-titlebar:not([data-signed-in]) .ntb-me { display: none; }
+  .nave-titlebar[data-signed-in] .ntb-signin { display: none; }
+  .nave-titlebar .ntb-badge { font-size: 10.5px; padding: 3px 9px; border-radius: 999px;
+    font-family: var(--mono, ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace);
+    letter-spacing: 0.06em; border: 1px solid var(--line, #2a2317);
+    color: var(--dim, #9c927f); white-space: nowrap; }
+  .nave-titlebar .ntb-badge.ntb-kind-extension { border-color: var(--good, #8fae6a); color: var(--good, #8fae6a); }
+  .nave-titlebar .ntb-badge.ntb-kind-bunker { border-color: var(--accent, #c39a56); color: var(--accent, #c39a56); }
+  .nave-titlebar .ntb-badge.ntb-kind-local { border-color: var(--warn, #d9a648); color: var(--warn, #d9a648); }
+  .nave-titlebar .ntb-npub { font-size: 11px; letter-spacing: 0.05em;
+    font-family: var(--mono, ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace);
+    border: 1px solid var(--line, #2a2317); color: var(--dim, #9c927f); border-radius: 999px;
+    padding: 5px 12px; cursor: pointer; transition: border-color .14s, color .14s; }
+  .nave-titlebar .ntb-npub:hover { border-color: var(--accent, #c39a56); color: var(--accent-bright, #e2c079); }
+  .nave-titlebar .ntb-npub.ntb-copied { border-color: var(--good, #8fae6a); color: var(--good, #8fae6a); }
+  .nave-titlebar .ntb-npub.ntb-expanded { word-break: break-all; user-select: all; }
+  .nave-titlebar .ntb-btn { background: transparent; color: var(--text, #f4efe4);
+    border: 1px solid var(--line, #2a2317); border-radius: var(--r-sm, 6px); padding: 8px 15px;
+    font-family: inherit; font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; cursor: pointer;
+    transition: border-color .14s, color .14s, background .14s; }
+  .nave-titlebar .ntb-btn:hover { border-color: var(--accent, #c39a56); color: var(--accent-bright, #e2c079); }
+  .nave-titlebar .ntb-btn.ntb-primary { background: var(--accent, #c39a56); border-color: var(--accent, #c39a56);
+    color: var(--accent-ink, #0b0906); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+  .nave-titlebar .ntb-btn.ntb-primary:hover { background: var(--accent-bright, #e2c079);
+    border-color: var(--accent-bright, #e2c079); color: var(--accent-ink, #0b0906); }
+  @media (max-width: 640px) {
+    .nave-titlebar .ntb-tag { display: none; }
+    .nave-titlebar .ntb-bar { flex-wrap: wrap; row-gap: 10px; padding: 11px 16px; }
+    .nave-titlebar .ntb-me, .nave-titlebar .ntb-signin { flex-wrap: wrap; }
+  }
+</style>
+<header class="nave-titlebar">
+  <div class="ntb-bar">
+    <span class="ntb-seal" aria-hidden="true"><svg viewBox="0 0 32 32" aria-hidden="true">
+      <rect x="1" y="1" width="30" height="30" rx="7" fill="#0b0906" stroke="#c0705a" stroke-opacity=".5" stroke-width="1.2"/>
+      <g transform="translate(4 4)" fill="none" stroke="#c0705a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="4"/><path d="M12 12 H21"/><path d="M17 12 V15.5"/><path d="M20 12 V15.5"/></g>
+    </svg></span>
+    <h1 class="ntb-name">Nherit</h1>
+    <div class="ntb-tag">the will that stays current</div>
+    <div class="ntb-spacer"></div>
+    <div class="ntb-me" id="me">
+      <span class="ntb-badge" id="me-kind" title="how this session signs"></span>
+      <code class="ntb-npub" id="my-npub" title="click to copy" role="button" tabindex="0" aria-label="copy your npub"></code>
+      <button class="ntb-btn" id="checkin" type="button" title="publish a liveness heartbeat for the dead-man's switch">Check in</button>
+      <button class="ntb-btn" id="refresh" type="button">Refresh</button>
+      <button class="ntb-btn" id="logout" type="button">Log out</button>
+    </div>
   </div>
 </header>
 <main>
