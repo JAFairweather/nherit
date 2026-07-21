@@ -113,7 +113,8 @@ globalThis.WebSocket = class { constructor(u) { calls.push(String(u)); throw new
 const modules = ['../shared/pad.mjs', '../shared/blossom.mjs', '../shared/manifest.mjs',
   '../shared/estate.mjs', '../shared/wrap.mjs', '../shared/notices.mjs', '../shared/invite.mjs',
   '../shared/escrowpkg.mjs', '../shared/shamir.mjs', '../shared/paper.mjs', '../shared/config.mjs',
-  '../lib/nipxx.mjs', '../lib/liverelay.mjs', '../lib/relay.mjs', '../lib/vendor/slip39.mjs',
+  '../lib/nipxx.mjs', '../lib/liverelay.mjs', '../lib/relay.mjs', '../lib/nave-connect.mjs',
+  '../lib/vendor/slip39.mjs',
   '../escrow/src/store.mjs', '../escrow/src/watch.mjs', '../escrow/src/checkin.mjs']
 let importErr = null
 let blossom, config

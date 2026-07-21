@@ -6,12 +6,12 @@
 // from paper cards. Plus the bearer-invite opener (logged-out flow).
 
 import { generateSecretKey, getPublicKey, nip19 } from 'nostr-tools'
-import { localSigner, receiveGrants, latestGrants, fetchScope } from '../lib/nipxx.mjs'
+import { receiveGrants, latestGrants, fetchScope } from '../lib/nipxx.mjs'
 import { sendClaimRequest } from '../shared/invite.mjs'
 import { sendVeto } from '../shared/escrowpkg.mjs'
 import { combineShares, validShareWords } from '../shared/shamir.mjs'
 import { LiveRelay } from '../lib/liverelay.mjs'
-import { $, esc, short, fmtSize, personName, state, login, RELAYS } from './main.mjs'
+import { $, esc, short, fmtSize, personName, state, login, keySigner, hexOf, RELAYS } from './main.mjs'
 import { docBytes, saveFile } from './docs.mjs'
 import { printKeyCard } from './paperkit.mjs'
 
@@ -251,7 +251,7 @@ export async function openInvite({ sk, relays }) {
     $('inv-print').onclick = () => printKeyCard(rSk)
     $('inv-continue').onclick = () => {
       el.style.display = 'none'
-      login(localSigner(rSk), Array.from(rSk, x => x.toString(16).padStart(2, '0')).join(''))
+      login(keySigner(rSk), hexOf(rSk))
     }
   }
 }
